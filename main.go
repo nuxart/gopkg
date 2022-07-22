@@ -76,7 +76,7 @@ func run() error {
 		}
 	}
 
-	fmt.Println(*httpFlag, *httpsFlag, *acmeFlag)
+	//fmt.Println(*httpFlag, *httpsFlag, *acmeFlag)
 	if *httpFlag != "" && (*httpsFlag == "" || *acmeFlag == "") {
 		server := *httpServer
 		server.Addr = *httpFlag
@@ -194,26 +194,26 @@ func (repo *Repo) GitHubRoot() string {
 // GitHubTree returns the repository tree name at GitHub for the selected version.
 func (repo *Repo) GitHubTree() string {
 	if repo.FullVersion == InvalidVersion {
-		fmt.Println("GitHubTree", "master")
+		//fmt.Println("GitHubTree", "master")
 		return "master"
 	}
-	fmt.Println("GitHubTree", repo.FullVersion.String())
+	//fmt.Println("GitHubTree", repo.FullVersion.String())
 	return repo.FullVersion.String()
 }
 
 // GopkgRoot returns the package root at nuxui.org, without a schema.
 func (repo *Repo) GopkgRoot() string {
 	str := repo.GopkgVersionRoot(repo.MajorVersion)
-	fmt.Printf("repo.MajorVersion = %s\n", repo.MajorVersion)
-	fmt.Println("GopkgRoot ======= ", str)
+	//fmt.Printf("repo.MajorVersion = %s\n", repo.MajorVersion)
+	//fmt.Println("GopkgRoot ======= ", str)
 	return str
 }
 
 // GopkgPath returns the package path at nuxui.org, without a schema.
 func (repo *Repo) GopkgPath() string {
 	str := repo.GopkgVersionRoot(repo.MajorVersion) + repo.SubPath
-	fmt.Printf("repo.MajorVersion = %s\n", repo.MajorVersion)
-	fmt.Println("GopkgPath ======= ", str)
+	//fmt.Printf("repo.MajorVersion = %s\n", repo.MajorVersion)
+	//fmt.Println("GopkgPath ======= ", str)
 	return str
 }
 
@@ -221,7 +221,7 @@ func (repo *Repo) GopkgPath() string {
 // provided version, without a schema.
 func (repo *Repo) GopkgVersionRoot(version Version) (ret string) {
 	ret = "nuxui.org/" + repo.Name
-	fmt.Println("GopkgVersionRoot:", ret)
+	//fmt.Println("GopkgVersionRoot:", ret)
 	return
 
 	version.Minor = -1
@@ -247,9 +247,9 @@ var patternOld = regexp.MustCompile(`^/(?:([a-z0-9][-a-z0-9]+)/)?((?:v0|v[1-9][0
 var patternNew = regexp.MustCompile(`^/([a-zA-Z][-.a-zA-Z0-9]*)(?:\.git)?((?:/[a-zA-Z0-9][-.a-zA-Z0-9]*)*)$`)
 
 func handler(resp http.ResponseWriter, req *http.Request) {
-	fmt.Println(*req)
+	//fmt.Println(*req)
 
-	fmt.Println("handler: ", req.URL.Path)
+	//fmt.Println("handler: ", req.URL.Path)
 	// TODO:: + nuxui
 	if req.URL.Path == "/health-check" {
 		resp.Write([]byte("ok"))
@@ -266,7 +266,7 @@ func handler(resp http.ResponseWriter, req *http.Request) {
 
 
 	m := patternNew.FindStringSubmatch(req.URL.Path)
-	fmt.Println("patternNew.FindStringSubmatch: ", m)
+	//fmt.Println("patternNew.FindStringSubmatch: ", m)
 	// oldFormat := false
 	// if m == nil {
 	// 	m = patternOld.FindStringSubmatch(req.URL.Path)
@@ -292,7 +292,7 @@ func handler(resp http.ResponseWriter, req *http.Request) {
 	// 		m[3][:strings.Index(m[3], ".")], m[3])
 	// 	return
 	// }
-	fmt.Println("repo := &Repo{")
+	//fmt.Println("repo := &Repo{")
 	repo := &Repo{
 		User:        "nuxui",
 		Name:        m[1],
@@ -301,12 +301,12 @@ func handler(resp http.ResponseWriter, req *http.Request) {
 		FullVersion: InvalidVersion,
 	}
 
-	fmt.Println("redirect:", redirect)
+	//fmt.Println("redirect:", redirect)
 	if r, ok := redirect[repoBase{repo.User, repo.Name}]; ok {
 		repo.RedirUser, repo.RedirName = repo.User, repo.Name
 		repo.User, repo.Name = r.user, r.name
 	}
-	fmt.Println("after redirect:", repo)
+	//fmt.Println("after redirect:", repo)
 
 
 	var ok bool
@@ -323,12 +323,12 @@ func handler(resp http.ResponseWriter, req *http.Request) {
 	if err == nil {
 		changed, versions, err = changeRefs(original, repo.MajorVersion)
 		repo.SetVersions(versions)
-		fmt.Println("versions", versions)
-		fmt.Println(repo.FullVersion)
-		fmt.Println("changed: ", string(changed))
+		//fmt.Println("versions", versions)
+		//fmt.Println(repo.FullVersion)
+		//fmt.Println("changed: ", string(changed))
 	}
 
-	fmt.Printf("switch err %s\n", err)
+	//fmt.Printf("switch err %s\n", err)
 	switch err {
 	case nil:
 		// all ok
@@ -351,13 +351,13 @@ func handler(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	fmt.Printf("repo.SubPath == /git-upload-pack is %t\n", repo.SubPath == "/git-upload-pack")
+	//fmt.Printf("repo.SubPath == /git-upload-pack is %t\n", repo.SubPath == "/git-upload-pack")
 	if repo.SubPath == "/git-upload-pack" {
 		proxyUploadPack(resp, req, repo)
 		return
 	}
 
-	fmt.Printf("repo.SubPath == /info/refs  is %t\n", repo.SubPath == "/info/refs")
+	//fmt.Printf("repo.SubPath == /info/refs  is %t\n", repo.SubPath == "/info/refs")
 	if repo.SubPath == "/info/refs" {
 		resp.Header().Set("Content-Type", "application/x-git-upload-pack-advertisement")
 		resp.Write(changed)
@@ -365,11 +365,11 @@ func handler(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	resp.Header().Set("Content-Type", "text/html")
-	fmt.Printf("req.FormValue(go-get) == 1 is %t\n", req.FormValue("go-get") == "1")
+	//fmt.Printf("req.FormValue(go-get) == 1 is %t\n", req.FormValue("go-get") == "1")
 
 	if req.FormValue("go-get") == "1" {
 		// execute simple template when this is a go-get request
-		fmt.Printf(`gogetTemplate.Execute(resp, repo)\n`)
+		//fmt.Printf(`gogetTemplate.Execute(resp, repo)\n`)
 		err = gogetTemplate.Execute(resp, repo)
 		if err != nil {
 			log.Printf("error executing go get template: %s\n", err)
@@ -391,7 +391,7 @@ func sendNotFound(resp http.ResponseWriter, msg string, args ...interface{}) {
 const refsSuffix = ".git/info/refs?service=git-upload-pack"
 
 func proxyUploadPack(resp http.ResponseWriter, req *http.Request, repo *Repo) {
-	fmt.Println("proxyUploadPack: ", req.Method, "https://"+repo.GitHubRoot()+"/git-upload-pack", req.Body)
+	//fmt.Println("proxyUploadPack: ", req.Method, "https://"+repo.GitHubRoot()+"/git-upload-pack", req.Body)
 	preq, err := http.NewRequest(req.Method, "https://"+repo.GitHubRoot()+"/git-upload-pack", req.Body)
 	if err != nil {
 		resp.WriteHeader(http.StatusInternalServerError)
@@ -434,7 +434,7 @@ var refsCacheLock sync.RWMutex
 const refsCacheTTL = 1 * time.Minute
 
 func getRefs(root string) []byte {
-	fmt.Printf("getRefs root=%s\n", root)
+	//fmt.Printf("getRefs root=%s\n", root)
 	refsCacheLock.RLock()
 	defer refsCacheLock.RUnlock()
 	if entry, ok := refsCache[root]; ok {
@@ -446,7 +446,7 @@ func getRefs(root string) []byte {
 }
 
 func setRefs(root string, refs []byte) {
-	fmt.Printf("setRefs root=%s\n", root)
+	//fmt.Printf("setRefs root=%s\n", root)
 
 	refsCacheLock.Lock()
 	defer refsCacheLock.Unlock()
@@ -462,19 +462,19 @@ func setRefs(root string, refs []byte) {
 }
 
 func fetchRefs(repo *Repo) (data []byte, err error) {
-	fmt.Println("fetchRefs", *repo)
+	//fmt.Println("fetchRefs", *repo)
 	if refs := getRefs(repo.GitHubRoot()); refs != nil {
 		return refs, nil
 	}
 
 	resp, err := httpClient.Get("https://" + repo.GitHubRoot() + refsSuffix)
-	fmt.Println("httpClient.Get  ", "https://" + repo.GitHubRoot() + refsSuffix, "error: ", err)
+	//fmt.Println("httpClient.Get  ", "https://" + repo.GitHubRoot() + refsSuffix, "error: ", err)
 	if err != nil {
 		return nil, fmt.Errorf("cannot talk to GitHub: %v", err)
 	}
 	defer resp.Body.Close()
 
-	fmt.Println("resp.StatusCode: ", resp.StatusCode)
+	//fmt.Println("resp.StatusCode: ", resp.StatusCode)
 	switch resp.StatusCode {
 	case 200:
 		// ok
@@ -485,11 +485,11 @@ func fetchRefs(repo *Repo) (data []byte, err error) {
 	}
 
 	data, err = ioutil.ReadAll(resp.Body)
-	fmt.Println("ioutil.ReadAll(resp.Body): ", string(data))
+	//fmt.Println("ioutil.ReadAll(resp.Body): ", string(data))
 	if err != nil {
 		return nil, fmt.Errorf("error reading from GitHub: %v", err)
 	}
-	fmt.Println("setRefs === ")
+	//fmt.Println("setRefs === ")
 	setRefs(repo.GitHubRoot(), data)
 	return data, err
 }
@@ -615,7 +615,7 @@ func changeRefs(data []byte, major Version) (changed []byte, versions VersionLis
 		buf.Write(data[hlinej:])
 	}
 
-	fmt.Println(string(buf.Bytes()))
+	//fmt.Println(string(buf.Bytes()))
 
 	return buf.Bytes(), versions, nil
 }
