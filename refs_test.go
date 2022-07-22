@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
-	. "gopkg.in/check.v1"
+	. "nuxui.org/check.v1"
 	"sort"
 )
 
